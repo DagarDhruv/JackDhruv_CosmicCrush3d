@@ -31,7 +31,6 @@ public class PlayerController : MonoBehaviour
     {
         // Get and store the Rigidbody component attached to the player.
         rb = GetComponent<Rigidbody>();
-
         // Initialize count to zero.
         count = 0;
 
@@ -51,6 +50,10 @@ public class PlayerController : MonoBehaviour
         // Store the X and Y components of the movement.
         movementX = movementVector.x;
         movementY = movementVector.y;
+        rb.mass = rb.mass * 0.99f;
+        transform.localScale = transform.localScale * 0.99f;
+
+
     }
 
     // FixedUpdate is called once per fixed frame-rate frame.
@@ -64,19 +67,24 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    void OnTriggerEnter(Collider other)
+
+    void OnCollisionEnter(Collision collision)
     {
-        // Check if the object the player collided with has the "PickUp" tag.
-        if (other.gameObject.CompareTag("PickUp"))
+        if (collision.gameObject.CompareTag("enemy"))
         {
-            // Deactivate the collided object (making it disappear).
-            other.gameObject.SetActive(false);
+            Rigidbody rbEnemy;
+            rbEnemy = collision.gameObject.GetComponent<Rigidbody>();
+            Debug.Log("enemy collsiion");
+            if (rbEnemy.mass < rb.mass)
+            {
+                rb.mass = rb.mass + rbEnemy.mass;
 
-            // Increment the count of "PickUp" objects collected.
-            count = count + 1;
-
-            // Update the count display.
-            SetCountText();
+                collision.gameObject.SetActive(false);
+                count = count + 1;
+                SetCountText();
+                // Update the count display.
+                SetCountText();
+            }
         }
     }
 
@@ -87,10 +95,13 @@ public class PlayerController : MonoBehaviour
         countText.text = "Count: " + count.ToString();
 
         // Check if the count has reached or exceeded the win condition.
-        if (count >= 12)
+        if (count >= 15)
         {
             // Display the win text.
             winTextObject.SetActive(true);
         }
     }
 }
+
+
+
