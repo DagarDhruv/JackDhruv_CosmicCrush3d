@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
     // Variable to keep track of collected "PickUp" objects.
     private int count;
-
+    bool gameOver = false;
     // Movement along X and Y axes.
     private float movementX;
     private float movementY;
@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour
     // UI object to display winning text.
     public GameObject winTextObject;
 
+
+    public GameObject loseTextObject;
     // Start is called before the first frame update.
     void Start()
     {
@@ -39,6 +41,7 @@ public class PlayerController : MonoBehaviour
 
         // Initially set the win text to be inactive.
         winTextObject.SetActive(false);
+        loseTextObject.SetActive(false);
     }
 
     // This function is called when a move input is detected.
@@ -50,8 +53,8 @@ public class PlayerController : MonoBehaviour
         // Store the X and Y components of the movement.
         movementX = movementVector.x;
         movementY = movementVector.y;
-        rb.mass = rb.mass * 0.99f;
-        transform.localScale = transform.localScale * 0.99f;
+        rb.mass = rb.mass * 0.995f;
+        transform.localScale = transform.localScale * 0.995f;
 
 
     }
@@ -60,6 +63,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         // Create a 3D movement vector using the X and Y inputs.
+
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
 
         // Apply force to the Rigidbody to move the player.
@@ -75,15 +79,22 @@ public class PlayerController : MonoBehaviour
             Rigidbody rbEnemy;
             rbEnemy = collision.gameObject.GetComponent<Rigidbody>();
             Debug.Log("enemy collsiion");
-            if (rbEnemy.mass < rb.mass)
+            if (rbEnemy.mass < rb.mass && !gameOver)
             {
-                rb.mass = rb.mass + rbEnemy.mass;
+                rb.mass = rb.mass + (rbEnemy.mass/3);
+                transform.localScale += Vector3.one * (rbEnemy.mass/3);
+
 
                 collision.gameObject.SetActive(false);
                 count = count + 1;
                 SetCountText();
                 // Update the count display.
                 SetCountText();
+            }
+            else
+            {
+                gameOver = true;
+                loseTextObject.SetActive(true);
             }
         }
     }
