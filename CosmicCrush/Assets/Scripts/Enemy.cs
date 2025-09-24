@@ -4,24 +4,34 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    public float speed = 0.1f; // Fixed movement speed
+    private Rigidbody rb;
 
-    Vector3 RandomVector(float min, float max)
-    {
-        var x = Random.Range(min, max);
-        var y = 0;
-        var z = Random.Range(min, max);
-        return new Vector3(x, y, z);
-    }
-    // Start is called before the first frame update
     void Start()
     {
-        var rb = GetComponent<Rigidbody>();
-        rb.velocity = RandomVector(0f, 5f);
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.drag = 0f;
+        rb.angularDrag = 0f;
+
+        // Set initial velocity in a random XZ direction
+        rb.velocity = GetRandomDirection() * speed;
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        // Maintain fixed speed and current direction
+        rb.velocity = rb.velocity.normalized * speed;
+    }
+
+    Vector3 GetRandomDirection()
+    {
+        Vector3 dir;
+        do
+        {
+            dir = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+        } while (dir.magnitude < 0.1f); // Avoid near-zero direction
+
+        return dir.normalized;
     }
 }
